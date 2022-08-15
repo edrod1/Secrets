@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const mongoose = require("mongoose");
+const encrypt = require("mongoose-encryption");
 
 const app = express();
 
@@ -22,10 +23,15 @@ async function main() {
   await mongoose.connect(url + dbPath);
   //{useNewUrlParser: true} //(no longer necessary)avoids depreciation warning
 
-const userSchema = {
+const userSchema = new mongoose.Schema ({
   email: String,
   password: String
-};
+});
+
+          // encryption package for userSchema
+const secret = "Thisisoutlittlesecret.";                        //field
+userSchema.plugin(encrypt, { secret: secret, encryptedFields: ["password"] });
+
 
 const User = new mongoose.model("User", userSchema);
 
@@ -74,6 +80,11 @@ app.post("/login", function(req, res){
   });
 
 });
+
+
+
+
+
 
 
 app.listen(3000,function(req,res){
